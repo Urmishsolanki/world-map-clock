@@ -1,0 +1,72 @@
+@extends('admin.layouts.default')
+
+@section('content')
+<main id="main" class="main"> 
+    <section class="section profile-page">      
+        <div class="card">
+            <div class="card-body">                
+                <div class="d-flex align-items-center justify-content-between">
+                  <h5 class="card-title">Update Your Info</h5>  
+                  <a href="{{ route('home') }}" ><span class="btn btn-primary">Back to List</span></a>
+                </div>
+                @if (Session::has('message'))
+                  <div class="alert alert-success">         
+                      <li>{{ Session::get('message') }}</li>          
+                  </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger" role="alert">
+                    {!! implode('', $errors->all('<div><li>:message</li></div>')) !!}
+                    </div>
+                @endif
+                <!-- Multi Columns Form -->
+                <form class="row g-3" action="{{url('user/store')}}" method="post" id="searchFrom" name="searchFrom">
+                    @csrf   
+                    <div class="col-md-6">
+                        @php                            
+                            if((old('name')) != ""){
+                                $name = old('name');
+                            }elseif($user[0]->name  != ""){
+                                $name = $user[0]->name ;
+                            }else{
+                                $name = "";
+                            }
+                        @endphp 
+                        <label for="inputName5" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{$name}}" placeholder="Enter Name">
+                    </div>  
+                    <div class="col-md-6">
+                        @php                            
+                            if((old('email')) != ""){
+                                $email = old('email');
+                            }elseif($user[0]->email  != ""){
+                                $email = $user[0]->email ;
+                            }else{
+                                $email = "";
+                            }
+                        @endphp 
+                        <label for="inputName5" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{$email}}" placeholder="Enter Email">
+                    </div> 
+                    <div class="text-">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </div>                    
+                </form><!-- End Multi Columns Form -->                
+            </div>
+            <div class="col-12" style="padding-left: 20px;">
+                <p class="small">You want to Update Password? <a href="{{url('updatePasswordView')}}">Click here</a></p>
+            </div>
+        </div>
+    </section>
+
+</main><!-- End #main -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+jQuery(document).ready(function () {
+    setTimeout(function(){  
+      jQuery('.alert-success').fadeOut(1000);                        
+  }, 1500); 
+});
+</script>
+@endsection

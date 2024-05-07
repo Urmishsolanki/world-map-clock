@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Response;
+use App\Models\City;
+
+class CityController extends Controller
+{    
+    // public function index()
+    // {       
+    //     $city = DB::table('cities')->get();
+    //     return view('admin.city.index',compact('city'));
+    // }
+    
+    public function create()
+    {     
+        if (Auth::user()){   
+            return view('admin.city.add');
+        }else{
+            return redirect('/login');
+        }
+    }
+
+    public function store(Request $request)
+    {   
+        $request->validate(
+            [
+                'name' => 'required|unique:cities',                
+            ], 
+            [
+                'name.required' => 'City name is required field.',          
+                'name.unique' => 'This city name is already Added.',               
+            ]
+        );
+
+        $input = $request->all();
+        
+        $city=new City();
+        $city->name=$input['name'];
+        $city->created_at=date('Y-m-d H:i:s');
+        $city->updated_at=date('Y-m-d H:i:s');
+        $city->save();
+        
+        return redirect('home')->with('message','City Successfully Added.');
+    }
+    
+    public function show($id)
+    {
+        
+    }
+
+    public function edit($id)
+    {      
+        if (Auth::user()){                
+            $city=City::find($id);         
+            return view('admin.city.edit',compact('city'));
+        }else{
+            return redirect('/login');
+        }
+    }
+    
+    public function update(Request $request, $id)
+    {    
+        $request->validate(
+            [
+                'name' => 'required|unique:cities,name,'.$id,                
+            ], 
+            [
+                'name.required' => 'City name is required field.',          
+                'name.unique' => 'This city name is already Added.',               
+            ]
+        );
+
+        $input = $request->all();
+        
+        $city=City::find($id);    
+        $city->name=$input['name'];        
+        $city->updated_at=date('Y-m-d H:i:s');
+        $city->save();       
+       
+        return redirect('home')->with('message','City Successfully Updated.');          
+    }
+
+    public function destroy($id)
+    {        
+        $city=City::find($id);    
+        $city->delete();
+        $message="City Successfully Deleted.";
+        return Response::json($message);  
+    }
+
+    public function getCity(){
+        $city = City::latest()->get();
+        foreach ($city as $cityKey => $cityValue) {            
+            $citydata[]=$cityValue->name;
+            
+        }        
+        exit(json_encode($citydata));
+    }
+}
